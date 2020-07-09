@@ -5,11 +5,16 @@
 Use the timeit and cProfile libraries to find bad code.
 """
 
-__author__ = "???"
+__author__ = "Jordan Haagenson"
 
 import cProfile
 import pstats
 import functools
+import timeit
+
+from functools import wraps
+
+t = timeit.Timer(stmt="", setup=)
 
 
 def profile(func):
@@ -18,9 +23,18 @@ def profile(func):
     """
     # Be sure to review the lesson material on decorators.
     # You need to understand how they are constructed and used.
-    raise NotImplementedError("Complete this decorator function")
-
-
+    # raise NotImplementedError("Complete this decorator function")
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        """a function to be used as a decorator to measure the performance"""
+        prof = cProfile.Profile()
+        prof.enable()
+        result = func(*args, **kwargs)
+        prof.disable()
+        ps = pstats.Stats(prof).strip_dirs().sort_stats('cumulative')
+        return result
+    return decorator
+sxx 
 def read_movies(src):
     """Returns a list of movie titles."""
     print(f'Reading file: {src}')
@@ -35,7 +49,7 @@ def is_duplicate(title, movies):
             return True
     return False
 
-
+@profile
 def find_duplicate_movies(src):
     """Returns a list of duplicate movies from a src list."""
     movies = read_movies(src)
@@ -49,8 +63,9 @@ def find_duplicate_movies(src):
 
 def timeit_helper():
     """Part A: Obtain some profiling measurements using timeit."""
-    # YOUR CODE GOES HERE
-    pass
+    t = timeit.Timer(functools.partial(find_duplicate_movies, 'movies.txt'))
+    time_result = min(t.repeat(repeat=7, number=3)) / 3
+    print("Best time across 7 repeats or ")
 
 
 def main():
@@ -58,6 +73,7 @@ def main():
     result = find_duplicate_movies('movies.txt')
     print(f'Found {len(result)} duplicate movies:')
     print('\n'.join(result))
+    timeit_helper()
 
 
 if __name__ == '__main__':
