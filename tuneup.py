@@ -14,8 +14,6 @@ import timeit
 
 from functools import wraps
 
-t = timeit.Timer(stmt="", setup=)
-
 
 def profile(func):
     """A cProfile decorator function that can be used to
@@ -32,9 +30,11 @@ def profile(func):
         result = func(*args, **kwargs)
         prof.disable()
         ps = pstats.Stats(prof).strip_dirs().sort_stats('cumulative')
+        ps.print_stats(8)
         return result
     return decorator
-sxx 
+
+
 def read_movies(src):
     """Returns a list of movie titles."""
     print(f'Reading file: {src}')
@@ -45,27 +45,32 @@ def read_movies(src):
 def is_duplicate(title, movies):
     """Returns True if title is within movies list."""
     for movie in movies:
-        if movie.lower() == title.lower():
+        if movie.lower() == title:
             return True
     return False
+
 
 @profile
 def find_duplicate_movies(src):
     """Returns a list of duplicate movies from a src list."""
     movies = read_movies(src)
     duplicates = []
-    while movies:
-        movie = movies.pop()
-        if is_duplicate(movie, movies):
+    for movie in movies:
+        if is_duplicate(movie.lower(), movies):
             duplicates.append(movie)
     return duplicates
+    # while movies:
+    #     movie = movies.pop()
+    #     if is_duplicate(movie, movies):
+    #         duplicates.append(movie)
+    # return duplicates
 
 
 def timeit_helper():
     """Part A: Obtain some profiling measurements using timeit."""
     t = timeit.Timer(functools.partial(find_duplicate_movies, 'movies.txt'))
     time_result = min(t.repeat(repeat=7, number=3)) / 3
-    print("Best time across 7 repeats or ")
+    print("Best time across 7 repeats of 3 runs per repeat ", time_result)
 
 
 def main():
