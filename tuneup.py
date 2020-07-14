@@ -35,6 +35,17 @@ def profile(func):
     return decorator
 
 
+class Memoize:
+    def __init__(self, fn):
+        self.fn = fn
+        self.memo = {}
+
+    def __call__(self, *args):
+        if args not in self.memo:
+            self.memo[args] = self.fn(*args)
+        return self.memo[args]
+
+
 def read_movies(src):
     """Returns a list of movie titles."""
     print(f'Reading file: {src}')
